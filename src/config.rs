@@ -19,7 +19,7 @@ pub struct Config {
 impl Config {
 	fn load_from_env() -> Result<Config> {
 		Ok(Config {
-			WEB_FOLDER: get_env("SERVER_WEB_FOLDER")?,
+			WEB_FOLDER: get_env("SERVICE_WEB_FOLDER")?,
 		})
 	}
 }

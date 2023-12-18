@@ -9,6 +9,8 @@ mod log;
 mod model;
 mod web;
 
+mod _dev_utils;
+
 pub use self::error::{Error, Result};
 pub use config::config;
 
