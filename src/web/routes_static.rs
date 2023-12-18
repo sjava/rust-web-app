@@ -1,3 +1,4 @@
+use crate::config;
 use axum::handler::HandlerWithoutStateExt;
 use axum::http::StatusCode;
 use axum::routing::{any_service, MethodRouter};
@@ -9,10 +10,11 @@ const WEB_FOLDER: &str = "web-folder";
 //       since ServeDir is a service.
 pub fn serve_dir() -> MethodRouter {
 	async fn handle_404() -> (StatusCode, &'static str) {
-		(StatusCode::NOT_FOUND, "Resource not found")
+		(StatusCode::NOT_FOUND, "Resource not found.")
 	}
 
 	any_service(
-		ServeDir::new(WEB_FOLDER).not_found_service(handle_404.into_service()),
+		ServeDir::new(&config().WEB_FOLDER)
+			.not_found_service(handle_404.into_service()),
 	)
 }
