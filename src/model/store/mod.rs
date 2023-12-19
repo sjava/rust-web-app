@@ -1,5 +1,7 @@
 mod error;
 
+use std::time::Duration;
+
 pub use self::error::{Error, Result};
 
 use crate::config;

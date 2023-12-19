@@ -82,7 +82,7 @@ mod tests {
 
 	#[serial]
 	#[tokio::test]
-	async fn test_task_ok() -> Result<()> {
+	async fn test_create_ok() -> Result<()> {
 		// -- Setup & Fixtures
 		let mm = _dev_utils::init_test().await;
 		let ctx = Ctx::root_ctx();
@@ -114,6 +114,59 @@ mod tests {
 
 		// -- Exec
 		let res = TaskBmc::get(&ctx, &mm, id).await;
+
+		// -- Check
+		assert!(
+			matches!(
+				res,
+				Err(Error::EntityNotFound {
+					entity: "task",
+					id: 100,
+				})
+			),
+			"EntityNotFound not matching"
+		);
+
+		Ok(())
+	}
+
+	#[serial]
+	#[tokio::test]
+	async fn test_list_ok() -> Result<()> {
+		// -- Setup & Fixtures
+		let mm = _dev_utils::init_test().await;
+		let ctx = Ctx::root_ctx();
+		let fx_titles = &["test_list_ok-task 01", "test_list_ok-task 02"];
+		_dev_utils::seed_tasks(&ctx, &mm, fx_titles).await?;
+
+		// -- Exec
+		let tasks = TaskBmc::list(&ctx, &mm).await?;
+
+		// -- Check
+		let tasks: Vec<Task> = tasks
+			.into_iter()
+			.filter(|t| t.title.starts_with("test_list_ok-task"))
+			.collect();
+		assert_eq!(tasks.len(), 2, "number of seeded task");
+
+		// -- Clean
+		for task in tasks.iter() {
+			TaskBmc::delete(&ctx, &mm, task.id).await?;
+		}
+
+		Ok(())
+	}
+
+	#[serial]
+	#[tokio::test]
+	async fn test_delete_err_not_found() -> Result<()> {
+		// -- Setup & Fixtures
+		let mm = _dev_utils::init_test().await;
+		let ctx = Ctx::root_ctx();
+		let id = 100;
+
+		// -- Exec
+		let res = TaskBmc::delete(&ctx, &mm, id).await;
 
 		// -- Check
 		assert!(
