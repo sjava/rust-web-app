@@ -1,19 +1,31 @@
-use crate::web;
+use crate::{model, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
+use std::sync::Arc;
 use tracing::debug;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug, Clone, Serialize, strum_macros::AsRefStr)]
+#[derive(Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
 	// -- Login
-	LoginFail,
+	LoginFailUsernameNotFound,
+	LoginFailUserHasNoPwd { user_id: i64 },
+	LoginFailPwdNotMatching { user_id: i64 },
 
 	// -- CtxExtError
 	CtxExt(web::mw_auth::CtxExtError),
+
+	// -- Model
+	Model(model::Error),
+}
+
+impl From<model::Error> for Error {
+	fn from(v: model::Error) -> Self {
+		Self::Model(v)
+	}
 }
 
 // region:    --- Axum IntoResponse
@@ -25,7 +37,7 @@ impl IntoResponse for Error {
 		let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
 
 		// Insert the Error into the reponse.
-		response.extensions_mut().insert(self);
+		response.extensions_mut().insert(Arc::new(self));
 
 		response
 	}
@@ -54,7 +66,14 @@ impl Error {
 
 		#[allow(unreachable_patterns)]
 		match self {
-			// -- Login/Auth
+			// -- Login
+			LoginFailUsernameNotFound
+			| LoginFailUserHasNoPwd { .. }
+			| LoginFailPwdNotMatching { .. } => {
+				(StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL)
+			}
+
+			// -- Auth
 			CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
 			// -- Fallback.

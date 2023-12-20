@@ -1,5 +1,5 @@
 use crate::ctx::Ctx;
-use crate::model::user::{User, UserBmd};
+use crate::model::user::{User, UserBmc};
 use crate::model::ModelManager;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
@@ -50,7 +50,7 @@ pub async fn init_dev_db() -> Result<(), Box<dyn std::error::Error>> {
 	let demo1_user: User = UserBmc::first_by_username(&ctx, &mm, "demo1")
 		.await?
 		.unwrap();
-	UserBmc::update_pwd(&ctx, &mm, &demo1_user.id, DEMO_PWD).await?;
+	UserBmc::update_pwd(&ctx, &mm, demo1_user.id, DEMO_PWD).await?;
 	info!("{:<12} - init_dev_db - set demo1 pwd", "FOR-DEV-ONLY");
 
 
