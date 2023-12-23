@@ -18,5 +18,9 @@ async fn main() -> Result<()> {
 	);
 	req_login.await?.print().await?;
 
+	let req_logoff = hc.do_post("/api/req_logoff", json!({"logoff":true}));
+
+	hc.do_get("/hello").await?.print().await?;
+
 	Ok(())
 }

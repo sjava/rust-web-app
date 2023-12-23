@@ -18,7 +18,7 @@ pub struct Config {
 	pub PWD_KEY: Vec<u8>,
 
 	pub TOKEN_KEY: Vec<u8>,
-	pub TOKEN_DURATION_SEC: u64,
+	pub TOKEN_DURATION_SEC: f64,
 
 	// -- DB
 	pub DB_URL: String,

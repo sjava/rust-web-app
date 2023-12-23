@@ -1,22 +1,12 @@
-use serde::Serialize;
-
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub enum Error {
-	// -- Key
-	KeyFailHmac,
+	// -- Time
+	DateFailParse(String),
 
-	// -- Pwd
-	PwdNotMatching,
-
-	// --Token
-	TokenInvalidFormat,
-	TokenCannotDecodeIdent,
-	TokenCannotDecodeExp,
-	TokenSignatureNotMatching,
-	TokenExpNotIso,
-	TokenExpired,
+	// -- Base64
+	FailToB64uDecode,
 }
 
 impl std::fmt::Display for Error {
@@ -27,5 +17,4 @@ impl std::fmt::Display for Error {
 		write!(f, "{self:?}")
 	}
 }
-
 impl std::error::Error for Error {}

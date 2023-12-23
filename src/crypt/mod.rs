@@ -1,5 +1,6 @@
 mod error;
 pub mod pwd;
+pub mod token;
 
 use std::result;
 
