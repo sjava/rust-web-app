@@ -29,7 +29,7 @@ pub async fn mw_ctx_require(
 }
 
 pub async fn mw_ctx_resolve(
-	mm: State<ModelManager>,
+	State(mm): State<ModelManager>,
 	cookies: Cookies,
 	mut req: Request<Body>,
 	next: Next,
@@ -50,7 +50,7 @@ pub async fn mw_ctx_resolve(
 	Ok(next.run(req).await)
 }
 
-async fn _ctx_resolve(mm: State<ModelManager>, cookies: &Cookies) -> CtxExtResult {
+async fn _ctx_resolve(mm: ModelManager, cookies: &Cookies) -> CtxExtResult {
 	let token = cookies
 		.get(AUTH_TOKEN)
 		.map(|c| c.value().to_string())
