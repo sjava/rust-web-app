@@ -24,9 +24,9 @@ pub enum Error {
 }
 
 impl From<crypt::Error> for Error {
-    fn from(v: crypt::Error) -> Self {
-        Self::Crypt(v)
-    }
+	fn from(v: crypt::Error) -> Self {
+		Self::Crypt(v)
+	}
 }
 
 impl From<model::Error> for Error {
