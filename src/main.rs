@@ -63,7 +63,8 @@ async fn main() -> Result<()> {
 		.await
 		.unwrap();
 	info!("{:<12} - {:?}\n", "LISTENING", listener.local_addr());
-	axum::serve(listener, routes_all.into_make_service())
+	// axum::serve(listener, routes_all.into_make_service())
+	axum::serve(listener, routes_all)
 		.await
 		.unwrap();
 	// endregion: --- Start Server
