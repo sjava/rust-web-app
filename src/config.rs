@@ -15,7 +15,7 @@ pub fn config() -> &'static Config {
 
 #[allow(non_snake_case)]
 pub struct Config {
-	// -- Crypt
+	// -- Keys
 	pub PWD_KEY: Vec<u8>,
 
 	pub TOKEN_KEY: Vec<u8>,

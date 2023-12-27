@@ -14,8 +14,8 @@ pub struct ContentToHash {
 
 pub fn hash_pwd(to_hash: &ContentToHash) -> Result<String> {
 	let key = &config().PWD_KEY;
-	let encrypted = hmac_sha512_hash(key, to_hash)?;
-	Ok(format!("#01#{encrypted}"))
+	let hashed = hmac_sha512_hash(key, to_hash)?;
+	Ok(format!("#01#{hashed}"))
 }
 
 pub fn validate_pwd(enc_content: &ContentToHash, pwd_ref: &str) -> Result<()> {
