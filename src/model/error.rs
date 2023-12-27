@@ -20,6 +20,8 @@ pub enum Error {
 
 	#[from]
 	Sqlx(#[serde_as(as = "DisplayFromStr")] sqlx::Error),
+	#[from]
+	SeaQuery(#[serde_as(as = "DisplayFromStr")] sea_query::error::Error),
 }
 
 // region:    --- Error Boilerplate

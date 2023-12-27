@@ -3,9 +3,10 @@ use crate::model::base::{self, DbBmc};
 use crate::model::ModelManager;
 use crate::model::Result;
 use crate::pwd::{self, ContentToHash};
-
+use modql::field::{Fields, HasFields};
+use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr};
+use sea_query_binder::SqlxBinder;
 use serde::{Deserialize, Serialize};
-use sqlb::{Fields, HasFields, SqlBuilder, Whereable};
 use sqlx::postgres::PgRow;
 use sqlx::FromRow;
 use uuid::Uuid;
@@ -50,6 +51,13 @@ impl UserBy for User {}
 impl UserBy for UserForLogin {}
 impl UserBy for UserForAuth {}
 
+#[derive(Iden)]
+enum UserIden {
+	Id,
+	Username,
+	Pwd,
+}
+
 pub struct UserBmc;
 impl DbBmc for UserBmc {
 	const TABLE: &'static str = "user";
@@ -72,10 +80,15 @@ impl UserBmc {
 		E: UserBy,
 	{
 		let db = mm.db();
-		let user = sqlb::select()
-			.table(UserBmc::TABLE)
-			.and_where("username", "=", username)
-			.fetch_optional::<_, E>(db)
+		let mut query = Query::select();
+		query
+			.from(Self::table_ref())
+			.columns(E::field_idens())
+			.and_where(Expr::col(UserIden::Username).eq(username));
+
+		let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+		let user = sqlx::query_as_with::<_, E, _>(&sql, values)
+			.fetch_optional(db)
 			.await?;
 		Ok(user)
 	}
@@ -94,12 +107,17 @@ impl UserBmc {
 			salt: user.pwd_salt,
 		})?;
 
-		sqlb::update()
-			.table(UserBmc::TABLE)
-			.and_where("id", "=", id)
-			.data(vec![("pwd", pwd).into()])
-			.exec(db)
-			.await?;
+		let mut query = Query::update();
+		query
+			.table(Self::table_ref())
+			.value(UserIden::Pwd, SimpleExpr::from(pwd))
+			.and_where(Expr::col(UserIden::Id).eq(id));
+
+		let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+		let _count = sqlx::query_with(&sql, values)
+			.execute(db)
+			.await?
+			.rows_affected();
 		Ok(())
 	}
 }
