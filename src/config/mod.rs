@@ -1,7 +1,7 @@
 mod error;
 
 pub use self::error::{Error, Result};
-use crate::utils::b64u_decode;
+use crate::utils::b64::b64u_decode;
 use std::env;
 use std::str::FromStr;
 use std::sync::OnceLock;
