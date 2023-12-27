@@ -1,6 +1,5 @@
+mod params;
 mod task_rpc;
-
-use std::sync::Arc;
 
 use crate::ctx::Ctx;
 use crate::model::ModelManager;
@@ -10,8 +9,10 @@ use axum::extract::State;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use axum::{Json, Router};
+use params::*;
 use serde::Deserialize;
 use serde_json::{from_value, json, to_value, Value};
+use std::sync::Arc;
 use tracing::debug;
 
 #[derive(Deserialize)]
@@ -21,20 +22,10 @@ struct RpcRequest {
 	params: Option<Value>,
 }
 
-#[derive(Deserialize)]
-pub struct ParamsForCreate<D> {
-	data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsForUpdate<D> {
-	id: i64,
-	data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsIded {
-	id: i64,
+#[derive(Debug)]
+pub struct RpcInfo {
+	pub id: Option<Value>,
+	pub method: String,
 }
 
 pub fn routes(mm: ModelManager) -> Router {
@@ -57,12 +48,6 @@ async fn rpc_handler(
 	res.extensions_mut().insert(Arc::new(rpc_info));
 
 	res
-}
-
-#[derive(Debug)]
-pub struct RpcInfo {
-	pub id: Option<Value>,
-	pub method: String,
 }
 
 macro_rules! exec_rpc_fn {

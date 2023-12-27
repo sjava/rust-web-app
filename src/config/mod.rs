@@ -1,4 +1,6 @@
-use crate::{Error, Result};
+mod error;
+
+pub use self::error::{Error, Result};
 use crate::utils::b64u_decode;
 use std::env;
 use std::str::FromStr;
@@ -39,7 +41,7 @@ impl Config {
 }
 
 fn get_env(name: &'static str) -> Result<String> {
-	env::var(name).map_err(|_| Error::ConfigMissingEnv(name))
+	env::var(name).map_err(|_| Error::MissingEnv(name))
 }
 
 fn get_env_parse<T>(name: &'static str) -> Result<T>
@@ -48,9 +50,9 @@ where
 {
 	get_env(name)?
 		.parse::<T>()
-		.map_err(|_| Error::ConfigWrongFormat(name))
+		.map_err(|_| Error::WrongFormat(name))
 }
 
 fn get_env_b64u_as_u8s(name: &'static str) -> Result<Vec<u8>> {
-	b64u_decode(&get_env(name)?).map_err(|_| Error::ConfigWrongFormat(name))
+	b64u_decode(&get_env(name)?).map_err(|_| Error::WrongFormat(name))
 }
