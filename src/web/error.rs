@@ -1,4 +1,4 @@
-use crate::{crypt, model, web};
+use crate::{model, pwd, token, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
@@ -25,7 +25,8 @@ pub enum Error {
 
 	// -- Model
 	Model(model::Error),
-	Crypt(crypt::Error),
+	Pwd(pwd::Error),
+	Token(token::Error),
 
 	// -- External Modules
 	SerdeJson(String),
@@ -37,9 +38,15 @@ impl From<serde_json::Error> for Error {
 	}
 }
 
-impl From<crypt::Error> for Error {
-	fn from(v: crypt::Error) -> Self {
-		Self::Crypt(v)
+impl From<pwd::Error> for Error {
+	fn from(v: pwd::Error) -> Self {
+		Self::Pwd(v)
+	}
+}
+
+impl From<token::Error> for Error {
+	fn from(value: token::Error) -> Self {
+		Self::Token(value)
 	}
 }
 

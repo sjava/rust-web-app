@@ -1,14 +1,14 @@
-use crate::crypt::{pwd, EncryptContent};
 use crate::ctx::Ctx;
 use crate::model::user::{UserBmc, UserForLogin};
 use crate::model::ModelManager;
+use crate::pwd::{self, ContentToHash};
 use crate::web::{self, remove_token_cookie, Error, Result};
 use axum::extract::State;
 use axum::routing::post;
 use axum::{Json, Router};
 use serde::Deserialize;
 use serde_json::{json, Value};
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 use tracing::debug;
 
 pub fn routes(mm: ModelManager) -> Router {
@@ -40,15 +40,15 @@ async fn api_login_handler(
 		return Err(Error::LoginFailUserHasNoPwd { user_id });
 	};
 	pwd::validate_pwd(
-		&EncryptContent {
+		&ContentToHash {
 			content: pwd_clear.clone(),
-			salt: user.pwd_salt.to_string(),
+			salt: user.pwd_salt,
 		},
 		&pwd,
 	)
 	.map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;
 
-	web::set_token_cookie(&cookies, &user.username, &user.token_salt.to_string())?;
+	web::set_token_cookie(&cookies, &user.username, user.token_salt)?;
 
 	// Create the success body.
 	let body = Json(json!({
