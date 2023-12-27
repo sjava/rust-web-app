@@ -83,7 +83,7 @@ async fn _rpc_handler(
 
 	let result_json: Value = match rpc_method.as_str() {
 		"create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
-		"list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm, rpc_params),
+		"list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
 		"update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
 		"delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
 		_ => return Err(Error::RpcMethodUnknow(rpc_method)),

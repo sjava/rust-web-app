@@ -14,7 +14,7 @@ const PG_DEV_POSTGRES_URL: &str =
 	"postgres://postgres:postgres@zyb@localhost/postgres";
 const PG_DEV_APP_URL: &str = "postgres://app_user:dev_only_pwd@localhost/app_db";
 
-const SQL_RECREATE_DB_FILE_NAME: &str = "sql/dev_initial/00-recreate-db.sql";
+const SQL_RECREATE_DB_FILE_NAME: &str = "00-recreate-db.sql";
 const SQL_DIR: &str = "sql/dev_initial";
 
 const DEMO_PWD: &str = "welcome";

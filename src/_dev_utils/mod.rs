@@ -6,7 +6,7 @@ use crate::model::{self, ModelManager};
 use tokio::sync::OnceCell;
 use tracing::info;
 
-pub async fn init_db() {
+pub async fn init_dev() {
 	static INIT: OnceCell<()> = OnceCell::const_new();
 
 	INIT.get_or_init(|| async {
@@ -21,7 +21,7 @@ pub async fn init_test() -> ModelManager {
 
 	let mm = INIT
 		.get_or_init(|| async {
-			init_db().await;
+			init_dev().await;
 			ModelManager::new().await.unwrap()
 		})
 		.await;
