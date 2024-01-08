@@ -1,14 +1,17 @@
+use crate::pwd::scheme;
+use derive_more::From;
 use serde::Serialize;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize,From)]
 pub enum Error {
 	// -- Key
-	KeyFail,
+	PwdWithSchemeFailedParse,
 
-	// -- Pwd
-	NotMatching,
+	// -- Modules
+	#[from]
+	Scheme(scheme::Error),
 }
 
 impl std::fmt::Display for Error {
